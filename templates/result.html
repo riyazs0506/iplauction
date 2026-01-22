@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="mb-4">🏆 Auction Result</h2>
+
+{% if winner %}
+<div class="alert alert-success mb-4">
+    <h4>🏆 Winning Team: {{ winner.name }}</h4>
+</div>
+{% endif %}
+
+{% for t in teams %}
+<div class="card p-3 mb-4 {% if winner and t.id == winner.id %}winner{% endif %}">
+
+    <h5>{{ t.name }}</h5>
+
+    <p>
+        <b>Spent:</b> ₹{{ t.spent }} Cr |
+        <b>Remaining:</b> ₹{{ t.purse - t.spent }} Cr |
+        <b>Total Strategy Points:</b> {{ t.total_points }}
+    </p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Category</th>
+                <th>Strategy Points</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in players %}
+            {% if p.team == t.name %}
+            <tr>
+                <td>{{ p.player }}</td>
+                <td>{{ p.category }}</td>
+                <td class="text-success">{{ p.strategy_points }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

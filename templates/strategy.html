@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="mb-4">📊 Strategy Points – Explanation</h2>
+
+<div class="card p-4 mb-4">
+    <ul>
+        <li><b>Role Weight:</b> All-rounders & bowlers carry higher impact</li>
+        <li><b>Value for Money:</b> Lower buy price gives bonus</li>
+        <li><b>Indian Core:</b> Indian players get bonus points</li>
+        <li><b>Performance:</b> Matches + form + consistency</li>
+        <li><b>Fitness:</b> Fit players score higher</li>
+    </ul>
+</div>
+
+<div class="card p-4">
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Category</th>
+            <th>Team</th>
+            <th>Strategy Points</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for p in players %}
+        <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.category }}</td>
+            <td>{{ p.team }}</td>
+            <td class="text-success">{{ p.strategy_points }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</div>
+{% endblock %}

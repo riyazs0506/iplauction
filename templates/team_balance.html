@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="mb-4">💰 Team Balance Overview</h2>
+
+{% for t in teams %}
+<div class="card p-3 mb-4">
+
+<h5>{{ t.name }}</h5>
+
+<p>
+<b>Total Purse:</b> ₹{{ t.purse }} Cr |
+<b>Spent:</b> ₹{{ t.spent }} Cr |
+<b>Remaining:</b> ₹{{ t.purse - t.spent }} Cr
+</p>
+
+<p>
+<b>Players Bought:</b> {{ t.player_count }} / 11 |
+<b>Remaining Slots:</b> {{ 11 - t.player_count }}
+</p>
+
+<table class="table table-bordered">
+<thead>
+<tr>
+    <th>Player</th>
+    <th>Category</th>
+    <th>Price (Cr)</th>
+</tr>
+</thead>
+<tbody>
+{% for p in players %}
+    {% if p.team == t.name %}
+    <tr>
+        <td>{{ p.player }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.price }}</td>
+    </tr>
+    {% endif %}
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

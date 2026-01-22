@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="title-glow mb-3">Auction Dashboard</h2>
+
+<!-- ================= CATEGORY SELECT ================= -->
+<form method="get" class="mb-4">
+    <select name="category" class="form-select w-25 d-inline">
+        <option disabled selected>Select Category</option>
+        <option>Batsman</option>
+        <option>Bowler</option>
+        <option>All-rounder</option>
+        <option>Wicket-Keeper</option>
+    </select>
+    <button class="btn btn-primary ms-2">Load</button>
+</form>
+
+{% if players %}
+<div class="row">
+
+<!-- ================= PLAYER LIST ================= -->
+<div class="col-md-4">
+    <div class="card p-2">
+        <table class="table">
+            {% for p in players %}
+            <tr class="player-row"
+                onclick="location.href='?category={{ category }}&player={{ p.id }}'">
+                <td>{{ p.name }}</td>
+                <td>
+                    <span class="badge badge-{{ p.status|lower }}">
+                        {{ p.status }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!-- ================= CURRENT PLAYER ================= -->
+<div class="col-md-8">
+{% if current %}
+
+<div class="card sold-flash">
+
+<h2 class="title-glow">{{ current.name }}</h2>
+
+<!-- ANNOUNCE PLAYER -->
+<button class="btn btn-outline-info mt-2"
+        onclick="event.stopPropagation(); announcePlayer('{{ current.name }}','{{ current.base_price }}')">
+    🎙️ Announce Player
+</button>
+
+<!-- ================= BASIC INFO ================= -->
+<div class="player-details mt-3">
+    <div class="player-box"><span>Category</span><strong>{{ current.category }}</strong></div>
+    <div class="player-box"><span>Role</span><strong>{{ current.role }}</strong></div>
+    <div class="player-box"><span>Nationality</span><strong>{{ current.nationality }}</strong></div>
+    <div class="player-box"><span>Base Price</span><strong>₹{{ current.base_price }} Cr</strong></div>
+</div>
+
+<!-- ================= PERFORMANCE STATS ================= -->
+<div class="player-details mt-3">
+    <div class="player-box">
+        <span>Matches</span>
+        <strong>{{ current.matches }}</strong>
+    </div>
+
+    {% if current.runs > 0 %}
+    <div class="player-box">
+        <span>Runs</span>
+        <strong>{{ current.runs }}</strong>
+    </div>
+    {% endif %}
+
+    {% if current.wickets > 0 %}
+    <div class="player-box">
+        <span>Wickets</span>
+        <strong>{{ current.wickets }}</strong>
+    </div>
+    {% endif %}
+
+    {% if current.strike_rate > 0 %}
+    <div class="player-box">
+        <span>Strike Rate</span>
+        <strong>{{ current.strike_rate }}</strong>
+    </div>
+    {% endif %}
+
+    {% if current.economy > 0 %}
+    <div class="player-box">
+        <span>Economy</span>
+        <strong>{{ current.economy }}</strong>
+    </div>
+    {% endif %}
+
+    {% if current.catches > 0 %}
+    <div class="player-box">
+        <span>Catches</span>
+        <strong>{{ current.catches }}</strong>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ================= FORM METRICS ================= -->
+<div class="player-details mt-3">
+    <div class="player-box">
+        <span>Form</span>
+        <strong>{{ current.form_rating }}/10</strong>
+    </div>
+    <div class="player-box">
+        <span>Fitness</span>
+        <strong>{{ current.fitness_rating }}/10</strong>
+    </div>
+    <div class="player-box">
+        <span>Consistency</span>
+        <strong>{{ current.consistency }}/10</strong>
+    </div>
+</div>
+
+<div class="alert alert-warning text-center mt-3">
+    Strategy Points Hidden During Auction
+</div>
+
+<!-- ================= SOLD FORM ================= -->
+<form method="post" action="/sell"
+onsubmit="return handleSold(
+    event,
+    '{{ current.name }}',
+    document.querySelector('select[name=team_id] option:checked').text,
+    document.querySelector('input[name=price]').value
+)">
+    <input type="hidden" name="player_id" value="{{ current.id }}">
+    <input type="hidden" name="category" value="{{ category }}">
+
+    <input class="form-control mt-3" name="price" placeholder="Final Price" required>
+
+    <select class="form-select mt-2" name="team_id">
+        {% for t in teams %}
+        <option value="{{ t.id }}">
+            {{ t.name }} (₹{{ t.purse - t.spent }})
+        </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-success w-100 mt-3">
+        SOLD
+    </button>
+</form>
+
+</div>
+{% endif %}
+</div>
+
+</div>
+{% endif %}
+</div>
+
+<!-- ================= AUDIO ================= -->
+<audio id="ipl" src="/static/sounds/ipl.mp3"></audio>
+<audio id="hammer" src="/static/sounds/hammer.mp3"></audio>
+
+<script>
+/* ================= IPL THEME ================= */
+let bgStarted = false;
+const theme = document.getElementById("ipl");
+const hammer = document.getElementById("hammer");
+
+function startIPLThemeOnce() {
+    if (bgStarted) return;
+    bgStarted = true;
+
+    theme.volume = 0.25;
+    theme.currentTime = 0;
+    theme.play().catch(()=>{});
+
+    setInterval(() => {
+        theme.currentTime = 0;
+        theme.play().catch(()=>{});
+    }, 210000); // 3.5 minutes
+}
+
+document.body.addEventListener("click", startIPLThemeOnce, { once: true });
+
+/* ================= VOICE ENGINE ================= */
+function loadVoices() {
+    return new Promise(resolve => {
+        let voices = speechSynthesis.getVoices();
+        if (voices.length) resolve(voices);
+        else speechSynthesis.onvoiceschanged = () =>
+            resolve(speechSynthesis.getVoices());
+    });
+}
+
+async function getVoice() {
+    const voices = await loadVoices();
+    const type = document.getElementById("voiceType").value;
+
+    if (type === "female") {
+        const femaleKeys = [
+            "zira","samantha","karen","female",
+            "victoria","moira","sona","google हिन्दी"
+        ];
+        return voices.find(v =>
+            femaleKeys.some(k => v.name.toLowerCase().includes(k))
+        ) || voices.find(v => v.pitch >= 1) || voices[0];
+    }
+
+    const maleKeys = ["david","daniel","alex","mark","male"];
+    return voices.find(v =>
+        maleKeys.some(k => v.name.toLowerCase().includes(k))
+    ) || voices[0];
+}
+
+async function speak(text) {
+    await loadVoices();
+    speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.voice = await getVoice();
+    u.rate = 0.9;
+    u.pitch = document.getElementById("voiceType").value === "female" ? 1.2 : 1;
+    u.volume = 1;
+
+    speechSynthesis.speak(u);
+}
+
+/* ================= AUCTION VOICES ================= */
+function announcePlayer(name, base) {
+    speak(`${name}, base price ${base} crores, is now in the auction`);
+}
+
+async function handleSold(e, player, team, price) {
+    e.preventDefault();
+
+    await speak("Going once");
+    await new Promise(r => setTimeout(r, 1200));
+
+    await speak("Going twice");
+    await new Promise(r => setTimeout(r, 1200));
+
+    hammer.currentTime = 0;
+    hammer.play().catch(()=>{});
+
+    await speak(`${player} sold to ${team} for ${price} crores`);
+
+    setTimeout(() => e.target.submit(), 2000);
+    return false;
+}
+</script>
+
+{% endblock %}
