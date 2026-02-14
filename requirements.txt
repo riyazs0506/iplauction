@@ -4,3 +4,4 @@ eventlet
 mysql-connector-python
 flask-socketio 
 eventlet
+gunicorn
