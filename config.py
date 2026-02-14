@@ -1,6 +1,9 @@
+import os
+
 MYSQL_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "123456",
-    "database": "ipl_auction_2026"
+    "host": os.environ.get("MYSQL_HOST"),
+    "user": os.environ.get("MYSQL_USER"),
+    "password": os.environ.get("MYSQL_PASSWORD"),
+    "database": os.environ.get("MYSQL_DATABASE"),
+    "port": int(os.environ.get("MYSQL_PORT", 3306))
 }
