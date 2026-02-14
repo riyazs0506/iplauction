@@ -1,10 +1,12 @@
 import eventlet
 eventlet.monkey_patch()
 
-from flask import Flask, render_template, request, redirect, url_for, session
-from flask_socketio import SocketIO
-import mysql.connector
 import os
+import mysql.connector
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_socketio import SocketIO
+from functools import wraps
+from datetime import datetime
 
 
 
@@ -18,6 +20,15 @@ current_player_id = None
 
 
 # ================= DATABASE CONNECTION =================
+# ================= DATABASE CONFIG =================
+MYSQL_CONFIG = {
+    "host": os.environ.get("MYSQL_HOST"),
+    "user": os.environ.get("MYSQL_USER"),
+    "password": os.environ.get("MYSQL_PASSWORD"),
+    "database": os.environ.get("MYSQL_DATABASE"),
+    "port": int(os.environ.get("MYSQL_PORT", 3306)),
+}
+
 db = mysql.connector.connect(**MYSQL_CONFIG)
 cursor = db.cursor(dictionary=True)
 
