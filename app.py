@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.secret_key = "ipl_secure_login_2026"
 
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 # ================= GLOBAL CURRENT PLAYER =================
 current_player_id = None
 
