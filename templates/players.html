@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4 title-glow">
+        📋 ALL PLAYERS LIST
+    </h2>
+
+    <div class="card shadow-lg p-3">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Nationality</th>
+                        <th>Base Price</th>
+                        <th>Sold Price</th>
+                        <th>Team</th>
+                        <th>Status</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in players %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td class="fw-bold">{{ p.name }}</td>
+                        <td>{{ p.category }}</td>
+                        <td>{{ p.nationality }}</td>
+                        <td>₹{{ p.base_price }}</td>
+
+                        <td>
+                            {% if p.sold_price %}
+                                <span class="text-success fw-bold">
+                                    ₹{{ p.sold_price }}
+                                </span>
+                                <br>
+                                <small class="text-muted">
+                                    Sold to {{ p.team }}
+                                </small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if p.team %}
+                                <span class="badge bg-primary">
+                                    {{ p.team }}
+                                </span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if p.status == 'SOLD' %}
+                                <span class="badge bg-success">SOLD</span>
+                            {% elif p.status == 'UNSOLD' %}
+                                <span class="badge bg-secondary">UNSOLD</span>
+                            {% else %}
+                                <span class="badge bg-info">AVAILABLE</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-warning"
+                                    data-id="{{ p.id }}"
+                                    data-name="{{ p.name }}"
+                                    data-price="{{ p.sold_price }}"
+                                    data-team="{{ p.team }}"
+                                    onclick="openEditModal(this)">
+                                ✏ Edit
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= EDIT MODAL ================= -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form method="POST" action="/update-sold-details">
+
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Edit Sold Details</h5>
+          <button type="button" class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <input type="hidden" name="player_id" id="editPlayerId">
+
+          <div class="mb-3">
+            <label class="form-label">Player Name</label>
+            <input type="text" class="form-control"
+                   id="editPlayerName" readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Sold Price (Cr)</label>
+            <input type="number"
+                   name="sold_price"
+                   id="editSoldPrice"
+                   class="form-control"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Team</label>
+            <select name="team_id"
+                    id="editTeamSelect"
+                    class="form-select"
+                    required>
+
+                {% for t in teams %}
+                <option value="{{ t.id }}">
+                    {{ t.name }}
+                </option>
+                {% endfor %}
+
+            </select>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            💾 Update
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function openEditModal(button) {
+
+    const id = button.getAttribute("data-id");
+    const name = button.getAttribute("data-name");
+    const price = button.getAttribute("data-price");
+    const team = button.getAttribute("data-team");
+
+    document.getElementById("editPlayerId").value = id;
+    document.getElementById("editPlayerName").value = name;
+    document.getElementById("editSoldPrice").value = price || "";
+
+    // Auto select team
+    const teamSelect = document.getElementById("editTeamSelect");
+    for (let i = 0; i < teamSelect.options.length; i++) {
+        if (teamSelect.options[i].text === team) {
+            teamSelect.selectedIndex = i;
+            break;
+        }
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById("editModal"));
+    modal.show();
+}
+</script>
+
+{% endblock %}

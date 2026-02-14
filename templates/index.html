@@ -1,7 +1,79 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5 text-center">
-<h1 class="title-glow">Welcome to IPL Auction 2026</h1>
-<a href="/auction" class="btn btn-primary mt-4">Start Auction</a>
+
+<div class="container text-center mt-5">
+
+    <h1 class="title-glow display-4 mb-4">
+        🏏 IPL Auction 2026
+    </h1>
+
+    <p class="lead text-muted mb-5">
+        Official Live Auction Management System
+    </p>
+
+    <div class="row justify-content-center g-4">
+
+        <!-- ADMIN LOGIN -->
+        <div class="col-md-3">
+            <div class="card shadow-lg p-4 dashboard-card">
+                <h4>🔐 Admin Panel</h4>
+                <p class="small text-muted">Control Auction & Results</p>
+                <a href="/admin-login" class="btn btn-danger w-100 mt-3">
+                    Admin Login
+                </a>
+            </div>
+        </div>
+
+        <!-- TEAM LOGIN -->
+        <div class="col-md-3">
+            <div class="card shadow-lg p-4 dashboard-card">
+                <h4>🏏 Team Login</h4>
+                <p class="small text-muted">Access Team Dashboard</p>
+                <a href="/team-login" class="btn btn-warning w-100 mt-3">
+                    Team Login
+                </a>
+            </div>
+        </div>
+
+        <!-- START AUCTION -->
+        <div class="col-md-3">
+            <div class="card shadow-lg p-4 dashboard-card">
+                <h4>🎙️ Auction Panel</h4>
+                <p class="small text-muted">Admin Control Panel</p>
+                <a href="/auction" class="btn btn-primary w-100 mt-3">
+                    Start Auction
+                </a>
+            </div>
+        </div>
+
+        <!-- LIVE BROADCAST -->
+        <div class="col-md-3">
+            <div class="card shadow-lg p-4 dashboard-card">
+                <h4>📺 Live Broadcast</h4>
+                <p class="small text-muted">Big Screen Display</p>
+                <a href="/broadcast" class="btn btn-success w-100 mt-3">
+                    View Broadcast
+                </a>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
+<style>
+
+.dashboard-card {
+    border-radius: 20px;
+    transition: 0.3s ease-in-out;
+    backdrop-filter: blur(6px);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 30px rgba(255,215,0,0.4);
+}
+
+</style>
+
 {% endblock %}

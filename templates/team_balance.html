@@ -3,47 +3,50 @@
 
 <div class="container mt-4">
 
-<h2 class="mb-4">💰 Team Balance Overview</h2>
+<h2 class="mb-4">💰 Team Balance & Slot Overview</h2>
 
-{% for t in teams %}
-<div class="card p-3 mb-4">
-
-<h5>{{ t.name }}</h5>
-
-<p>
-<b>Total Purse:</b> ₹{{ t.purse }} Cr |
-<b>Spent:</b> ₹{{ t.spent }} Cr |
-<b>Remaining:</b> ₹{{ t.purse - t.spent }} Cr
-</p>
-
-<p>
-<b>Players Bought:</b> {{ t.player_count }} / 11 |
-<b>Remaining Slots:</b> {{ 11 - t.player_count }}
-</p>
-
-<table class="table table-bordered">
-<thead>
+<table class="table table-bordered align-middle text-center">
+<thead class="table-dark">
 <tr>
-    <th>Player</th>
-    <th>Category</th>
-    <th>Price (Cr)</th>
+<th rowspan="2">Team</th>
+<th rowspan="2">Purse</th>
+<th rowspan="2">Spent</th>
+<th rowspan="2">Remaining</th>
+<th rowspan="2">Players</th>
+<th colspan="5">Slots Remaining</th>
+</tr>
+<tr class="table-secondary">
+<th>🏏 Bat</th>
+<th>🎯 Bowl</th>
+<th>⚡ AR</th>
+<th>🧤 WK</th>
+<th>🌍 Overseas</th>
 </tr>
 </thead>
+
 <tbody>
-{% for p in players %}
-    {% if p.team == t.name %}
-    <tr>
-        <td>{{ p.player }}</td>
-        <td>{{ p.category }}</td>
-        <td>{{ p.price }}</td>
-    </tr>
-    {% endif %}
+{% for t in teams %}
+<tr>
+<td class="fw-bold">{{ t.name }}</td>
+<td>₹{{ t.purse }}</td>
+<td class="text-danger fw-bold">₹{{ t.spent }}</td>
+<td class="text-success fw-bold">₹{{ t.purse - t.spent }}</td>
+<td>{{ t.player_count }}/11</td>
+
+<td class="{% if t.batsman_left==0 %}text-danger fw-bold{% endif %}">{{ t.batsman_left }}</td>
+<td class="{% if t.bowler_left==0 %}text-danger fw-bold{% endif %}">{{ t.bowler_left }}</td>
+<td class="{% if t.allrounder_left==0 %}text-danger fw-bold{% endif %}">{{ t.allrounder_left }}</td>
+<td class="{% if t.wk_left==0 %}text-danger fw-bold{% endif %}">{{ t.wk_left }}</td>
+<td class="{% if t.overseas_left==0 %}text-danger fw-bold{% endif %}">{{ t.overseas_left }}</td>
+</tr>
 {% endfor %}
 </tbody>
 </table>
 
+<div class="alert alert-info mt-3">
+<strong>Rules:</strong>
+4 Bat • 3 Bowl • 3 AR • 1 WK • Max 4 Overseas
 </div>
-{% endfor %}
 
 </div>
 {% endblock %}

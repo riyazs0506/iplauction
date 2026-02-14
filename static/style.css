@@ -2,18 +2,18 @@
    iOS PREMIUM COLOR PALETTE
 ===================================================== */
 :root{
-    --bg-main:#f2f3f7;          /* soft iOS background */
-    --bg-card:#ffffff;         /* clean card */
+    --bg-main:#f2f3f7;
+    --bg-card:#ffffff;
     --bg-card-alt:#f8f9fc;
 
-    --primary:#2563eb;         /* iOS blue */
+    --primary:#2563eb;
     --primary-soft:#e8edff;
 
-    --accent-gold:#f59e0b;     /* auction highlight */
+    --accent-gold:#f59e0b;
     --accent-green:#10b981;
     --accent-red:#ef4444;
 
-    --text-main:#111827;       /* near black */
+    --text-main:#111827;
     --text-secondary:#374151;
     --text-muted:#6b7280;
 
@@ -34,19 +34,73 @@ body{
 }
 
 /* =====================================================
-   NAVBAR
+   NAVBAR (TOP LAYER)
 ===================================================== */
-.navbar{
-    background:rgba(255,255,255,.9);
+.app-navbar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:90px;
+    background:rgba(255,255,255,.95);
     backdrop-filter:blur(14px);
     border-bottom:1px solid var(--border);
+    z-index:1200;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
 }
 
 .title-glow{
-    font-size:20px;
+    font-size:22px;
     font-weight:800;
     color:var(--primary);
     letter-spacing:.8px;
+}
+
+/* 🎵 Music Icon */
+.theme-btn{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    font-size:20px;
+    border:2px solid var(--accent-red);
+    background:#fff;
+    color:var(--accent-red);
+    font-weight:900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* =====================================================
+   APP LAYOUT
+===================================================== */
+.app-body{
+    background:#f1f5f9;
+}
+
+.app-content{
+    padding-top:120px;
+    padding-bottom:140px;
+    min-height:100vh;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+.app-footer{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    height:70px;
+    background:#ffffff;
+    border-top:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#475569;
+    font-size:14px;
+    z-index:1100;
 }
 
 /* =====================================================
@@ -58,6 +112,7 @@ body{
     padding:24px;
     border:1px solid var(--border);
     box-shadow:var(--shadow-soft);
+    margin-bottom:20px;
 }
 
 /* =====================================================
@@ -67,71 +122,32 @@ h1,h2,h3{
     font-weight:800;
     color:var(--text-main);
 }
-
 h2{
     font-size:30px;
 }
 
 /* =====================================================
-   PLAYER DETAILS
-===================================================== */
-.player-details{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-    gap:16px;
-    margin-top:22px;
-}
-
-.player-box{
-    background:var(--bg-card-alt);
-    border-radius:16px;
-    padding:18px 14px;
-    text-align:center;
-    border:1px solid var(--border);
-}
-
-.player-box span{
-    font-size:12px;
-    font-weight:600;
-    color:var(--text-muted);
-    text-transform:uppercase;
-}
-
-.player-box strong{
-    font-size:20px;
-    font-weight:800;
-    color:var(--text-main);
-}
-
-/* =====================================================
-   TABLES
+   TABLES (PLAYER LIST)
 ===================================================== */
 .table{
     width:100%;
     border-collapse:collapse;
 }
 
-.table th{
-    font-size:13px;
-    font-weight:700;
-    color:var(--text-muted);
-    padding:12px;
-    border-bottom:2px solid var(--border);
-}
-
 .table td{
     padding:14px 12px;
     font-size:15px;
-    color:var(--text-main);
     border-bottom:1px solid var(--border);
 }
 
-/* =====================================================
-   PLAYER LIST HOVER
-===================================================== */
 .player-row:hover{
     background:var(--primary-soft);
     cursor:pointer;
+}
+
+.table-active{
+    background:var(--primary-soft);
+    font-weight:800;
 }
 
 /* =====================================================
@@ -146,7 +162,7 @@ h2{
 
 .badge-pending{
     background:#e5e7eb;
-    color:var(--text-secondary);
+    color:#374151;
 }
 
 .badge-sold{
@@ -163,63 +179,127 @@ h2{
     font-weight:700;
 }
 
-.btn-primary{
-    background:var(--primary);
-    color:#fff;
-    border:none;
-}
-
-.btn-success{
-    background:var(--accent-green);
-    color:#fff;
-    border:none;
-}
-
-.btn-outline-warning{
-    border:2px solid var(--accent-gold);
-    color:var(--accent-gold);
-    background:#fff;
-}
+.btn-primary{ background:var(--primary); color:#fff; }
+.btn-success{ background:var(--accent-green); color:#fff; }
 
 /* =====================================================
-   INPUTS
+   AUCTION LAYOUT
 ===================================================== */
-.form-control,
-.form-select{
-    padding:14px;
-    border-radius:14px;
-    border:1px solid var(--border);
-    font-size:15px;
-    font-weight:600;
-    background:#fff;
-    color:var(--text-main);
+.auction-page{
+    max-width:1600px;
+    margin:auto;
 }
 
-.form-control::placeholder{
+.section-title{
+    font-weight:800;
+    margin-bottom:12px;
+    color:var(--primary);
+    letter-spacing:.5px;
+}
+
+.auction-layout{
+    align-items:flex-start;
+}
+
+/* LEFT QUEUE */
+.auction-left{
+    max-height:calc(100vh - 220px);
+    overflow-y:auto;
+    border-right:2px solid var(--border);
+}
+
+/* CENTER PODIUM */
+.auction-center{
+    display:flex;
+    justify-content:center;
+}
+
+.auction-podium{
+    text-align:center;
+    max-width:540px;
+    margin:auto;
+}
+
+.player-img{
+    width:180px;
+    height:180px;
+    object-fit:cover;
+    border-radius:20px;
+    border:3px solid var(--accent-gold);
+    margin-bottom:16px;
+}
+
+.player-name{
+    font-size:32px;
+    font-weight:900;
+}
+
+.player-sub{
+    font-weight:600;
     color:var(--text-muted);
+    margin-bottom:10px;
+}
+
+.base-price{
+    font-size:22px;
+    font-weight:900;
+    color:var(--accent-gold);
+    margin-bottom:18px;
+}
+
+.auction-controls{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+/* RIGHT STATS */
+.auction-right{
+    position:sticky;
+    top:120px;
+    width:280px;
+    max-width:280px;
+    flex-shrink:0;
+}
+
+.stats-card{
+    max-height:calc(100vh - 260px);
+    overflow-y:auto;
 }
 
 /* =====================================================
-   ALERTS
+   PLAYER STATS GRID
 ===================================================== */
-.alert{
-    border-radius:16px;
-    padding:16px;
+.player-details{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:12px;
+}
+
+.player-box{
+    background:var(--bg-card-alt);
+    border-radius:14px;
+    padding:12px;
+    text-align:center;
+    border:1px solid var(--border);
+}
+
+.player-box span{
+    font-size:11px;
     font-weight:600;
+    color:var(--text-muted);
+    text-transform:uppercase;
 }
 
-.alert-warning{
-    background:#fffbeb;
-    color:#92400e;
-}
-
-.alert-success{
-    background:#ecfdf5;
-    color:#065f46;
+.player-box strong{
+    font-size:16px;
+    font-weight:800;
 }
 
 /* =====================================================
-   SOLD EFFECT (SUBTLE)
+   SOLD FLASH EFFECT
 ===================================================== */
 .sold-flash{
     animation:soldPulse 1.2s ease-in-out;
@@ -232,115 +312,137 @@ h2{
 }
 
 /* =====================================================
-   WINNER
+   LIVE TICKER (BOTTOM BROADCAST BAR)
 ===================================================== */
-.winner{
-    border:2px solid var(--accent-gold);
-    background:#fffbeb;
+.live-ticker{
+    position:fixed;
+    bottom:70px;
+    width:100%;
+    background:linear-gradient(90deg,#7c0000,#dc2626,#7c0000);
+    color:#fff;
+    font-weight:800;
+    padding:12px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    z-index:1150;
+    box-shadow:0 -4px 16px rgba(0,0,0,.3);
 }
 
-
-/* ================== VISIBILITY FIX ================== */
-
-/* Force readable text inside tables */
-.table td,
-.table th {
-    color: #0f172a !important;   /* dark readable */
+.live-dot{
+    color:#ff0000;
+    animation:blink 1s infinite;
 }
 
-/* Dark header row */
-.table thead th {
-    background: #0b5ed7 !important;
-    color: #ffffff !important;
+@keyframes blink{
+    0%,50%,100%{opacity:1}
+    25%,75%{opacity:.3}
 }
-
-/* Card background brighter */
-.card {
-    background: #f8fafc !important;
-    color: #0f172a !important;
-    border-radius: 14px;
-}
-
-/* Strategy / result tables */
-.table tbody tr {
-    background: #ffffff !important;
-}
-
-.table tbody tr:nth-child(even) {
-    background: #f1f5f9 !important;
-}
-
-/* Strategy points highlight */
-.text-success {
-    color: #15803d !important;
-    font-weight: 700;
-}
-
-/* Winner highlight */
-.winner {
-    border: 3px solid #16a34a !important;
-    box-shadow: 0 0 15px rgba(22,163,74,0.4);
-}
-
 
 /* =====================================================
-   APP LAYOUT (FIXED HEADER & FOOTER)
+   SOLD BANNER (TOP CENTER)
 ===================================================== */
-
-.app-body {
-    background: #f1f5f9;
-    margin: 0;
-    padding: 0;
+.sold-banner{
+    position:fixed;
+    top:120px;
+    left:50%;
+    transform:translateX(-50%) translateY(-200%);
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+    padding:22px 60px;
+    border-radius:40px;
+    font-size:32px;
+    font-weight:900;
+    color:#fff;
+    letter-spacing:3px;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+    z-index:1300;
+    transition:.6s cubic-bezier(.4,0,.2,1);
 }
 
-/* Fixed Navbar */
-.app-navbar {
-    height: 64px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    z-index: 1030;
+.sold-banner.show{
+    transform:translateX(-50%) translateY(0);
 }
 
-/* Space for fixed header + footer */
-.app-content {
-    padding-top: 90px;   /* header height + gap */
-    padding-bottom: 80px; /* footer height + gap */
-    min-height: 100vh;
+.badge-unsold {
+    background: #6c757d;
+    color: #fff;
 }
 
-/* Fixed Footer */
-.app-footer {
+/* ================= CONFIRM BOX ================= */
+
+.confirm-box {
     position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 50px;
-    background: #ffffff;
-    border-top: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
     justify-content: center;
-    color: #475569;
-    font-size: 13px;
-    z-index: 1020;
+    align-items: center;
+    z-index: 9999;
 }
 
-/* Improve card spacing */
-.card {
-    margin-bottom: 20px;
+.confirm-content {
+    background: #1e1e2f;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
 }
 
-/* Tables readable */
-.table th {
-    background: #0b5ed7;
-    color: #ffffff;
+.confirm-content h5 {
+    color: #fff;
 }
 
-.table td {
-    background: #ffffff;
-    color: #0f172a;
+.confirm-box{
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
 }
 
-/* Title glow remains visible */
-.title-glow {
-    font-weight: 800;
+.confirm-content{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+}
+
+.auction-center {
+    min-height: 80vh;
+}
+
+.square-podium {
+    width: 450px;
+    height: 450px;
+    padding: 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(255, 193, 7, 0.4);
+}
+
+.player-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+.player-name {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.base-price {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #ffc107;
 }

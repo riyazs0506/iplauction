@@ -1,254 +1,201 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4">
+<div class="container-fluid auction-page">
 
-<h2 class="title-glow mb-3">Auction Dashboard</h2>
+<h2 class="title-glow text-center mb-3">IPL AUCTION DASHBOARD</h2>
+
+<!-- ================= TOP BAR ================= -->
+<div class="d-flex justify-content-center align-items-center gap-4 mb-4">
+
+    <!-- UNSOLD COUNT -->
+    <span class="badge bg-danger fs-6">
+        UNSOLD ({{ category or 'All' }}): {{ unsold_count }}
+    </span>
+
+    <!-- RE-AUCTION UNSOLD ONLY -->
+    <form method="get">
+        <input type="hidden" name="category" value="{{ category }}">
+        <input type="hidden" name="reauction" value="1">
+        <button class="btn btn-outline-warning btn-sm">
+            🔁 Re-Auction UNSOLD
+        </button>
+    </form>
+
+</div>
 
 <!-- ================= CATEGORY SELECT ================= -->
-<form method="get" class="mb-4">
-    <select name="category" class="form-select w-25 d-inline">
-        <option disabled selected>Select Category</option>
-        <option>Batsman</option>
-        <option>Bowler</option>
-        <option>All-rounder</option>
-        <option>Wicket-Keeper</option>
+<form method="get" class="mb-4 text-center">
+    <select name="category" class="form-select d-inline w-auto">
+        <option disabled {% if not category %}selected{% endif %}>Select Category</option>
+        <option {% if category=='Batsman' %}selected{% endif %}>Batsman</option>
+        <option {% if category=='Bowler' %}selected{% endif %}>Bowler</option>
+        <option {% if category=='All-rounder' %}selected{% endif %}>All-rounder</option>
+        <option {% if category=='Wicket-Keeper' %}selected{% endif %}>Wicket-Keeper</option>
     </select>
     <button class="btn btn-primary ms-2">Load</button>
 </form>
 
 {% if players %}
-<div class="row">
+<div class="row auction-layout gx-4">
 
-<!-- ================= PLAYER LIST ================= -->
-<div class="col-md-4">
-    <div class="card p-2">
-        <table class="table">
+<!-- ================= LEFT : PLAYER LIST ================= -->
+<div class="col-lg-3 auction-left">
+    <div class="card queue-card">
+        <h6 class="section-title">PLAYER QUEUE</h6>
+
+        <table class="table table-sm mb-0">
             {% for p in players %}
-            <tr class="player-row"
-                onclick="location.href='?category={{ category }}&player={{ p.id }}'">
-                <td>{{ p.name }}</td>
-                <td>
-                    <span class="badge badge-{{ p.status|lower }}">
-                        {{ p.status }}
-                    </span>
+            <tr class="player-row {% if current and p.id == current.id %}table-active{% endif %}"
+                onclick="location.href='?category={{ category }}&player={{ p.id }}{% if request.args.get('reauction') %}&reauction=1{% endif %}'">
+
+                <td class="fw-bold">
+                    {{ loop.index }}. {{ p.name }}
+                </td>
+
+                <td class="text-end">
+                    {% if p.status == 'SOLD' %}
+                        <span class="badge bg-success">SOLD</span>
+                    {% elif p.status == 'UNSOLD' %}
+                        <span class="badge bg-secondary">UNSOLD</span>
+                    {% else %}
+                        <span class="badge bg-info">AVAILABLE</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </table>
+
     </div>
 </div>
 
-<!-- ================= CURRENT PLAYER ================= -->
-<div class="col-md-8">
+<!-- ================= CENTER : AUCTION PODIUM ================= -->
+<div class="col-lg-6 d-flex justify-content-center align-items-center auction-center">
+
 {% if current %}
+<div class="card auction-podium square-podium">
 
-<div class="card sold-flash">
+    <img src="/static/players/{{ current.id }}.jpg"
+         onerror="this.src='/static/players/default.png'"
+         class="player-img">
 
-<h2 class="title-glow">{{ current.name }}</h2>
+    <h2 class="player-name">{{ current.name }}</h2>
 
-<!-- ANNOUNCE PLAYER -->
-<button class="btn btn-outline-info mt-2"
-        onclick="event.stopPropagation(); announcePlayer('{{ current.name }}','{{ current.base_price }}')">
-    🎙️ Announce Player
-</button>
+    <div class="player-sub">
+        {{ current.role }} • {{ current.nationality }}
+    </div>
 
-<!-- ================= BASIC INFO ================= -->
-<div class="player-details mt-3">
-    <div class="player-box"><span>Category</span><strong>{{ current.category }}</strong></div>
-    <div class="player-box"><span>Role</span><strong>{{ current.role }}</strong></div>
-    <div class="player-box"><span>Nationality</span><strong>{{ current.nationality }}</strong></div>
-    <div class="player-box"><span>Base Price</span><strong>₹{{ current.base_price }} Cr</strong></div>
+    <div class="base-price">
+        BASE PRICE ₹{{ current.base_price }} Cr
+    </div>
+
+    <!-- AUCTION CONTROLS -->
+    <div class="auction-controls">
+        <button class="btn btn-outline-info"
+            onclick="announcePlayer('{{ current.name }}','{{ current.base_price }}')">
+            🎙️ Announce
+        </button>
+    </div>
+
+    <!-- SOLD FORM -->
+    <form method="post" action="/sell" onsubmit="return validateSell()">
+
+        <input type="hidden" name="player_id" value="{{ current.id }}">
+        <input type="hidden" name="category" value="{{ category }}">
+
+        <input class="form-control mt-3" name="price"
+               placeholder="Final Price (Cr)" required>
+
+        <select class="form-select mt-2"
+                name="team_id"
+                id="teamSelect"
+                required>
+            <option value="" selected disabled>-- Select Team --</option>
+
+            {% for t in teams %}
+            <option value="{{ t.id }}"
+                {% if t.disabled %}disabled{% endif %}>
+                {{ t.name }}
+                {% if t.disabled %}❌ ({{ t.reason }}){% endif %}
+            </option>
+            {% endfor %}
+        </select>
+
+        <button class="btn btn-success w-100 mt-3">
+            🔨 SOLD
+        </button>
+    </form>
+
+    <!-- UNSOLD FORM -->
+    <form method="post" action="/unsold">
+        <input type="hidden" name="player_id" value="{{ current.id }}">
+        <input type="hidden" name="category" value="{{ category }}">
+
+        <button class="btn btn-secondary w-100 mt-2">
+            ❌ UNSOLD
+        </button>
+    </form>
+
+</div>
+{% endif %}
+
 </div>
 
-<!-- ================= PERFORMANCE STATS ================= -->
-<div class="player-details mt-3">
-    <div class="player-box">
-        <span>Matches</span>
-        <strong>{{ current.matches }}</strong>
+
+<!-- ================= RIGHT : FULL STATS ================= -->
+<div class="col-lg-3 auction-right">
+{% if current %}
+<div class="card stats-card">
+    <h6 class="section-title">PLAYER STATS</h6>
+
+    <div class="player-details">
+        <div class="player-box"><span>Matches</span><strong>{{ current.matches }}</strong></div>
+
+        {% if current.runs %}
+        <div class="player-box"><span>Runs</span><strong>{{ current.runs }}</strong></div>
+        {% endif %}
+
+        {% if current.wickets %}
+        <div class="player-box"><span>Wickets</span><strong>{{ current.wickets }}</strong></div>
+        {% endif %}
+
+        {% if current.strike_rate %}
+        <div class="player-box"><span>Strike Rate</span><strong>{{ current.strike_rate }}</strong></div>
+        {% endif %}
+
+        {% if current.economy %}
+        <div class="player-box"><span>Economy</span><strong>{{ current.economy }}</strong></div>
+        {% endif %}
+
+        {% if current.catches %}
+        <div class="player-box"><span>Catches</span><strong>{{ current.catches }}</strong></div>
+        {% endif %}
     </div>
 
-    {% if current.runs > 0 %}
-    <div class="player-box">
-        <span>Runs</span>
-        <strong>{{ current.runs }}</strong>
+    <hr>
+
+    <h6 class="section-title">RATINGS</h6>
+    <div class="player-details">
+        <div class="player-box"><span>Form</span><strong>{{ current.form_rating }}/10</strong></div>
+        <div class="player-box"><span>Fitness</span><strong>{{ current.fitness_rating }}/10</strong></div>
+        <div class="player-box"><span>Consistency</span><strong>{{ current.consistency }}/10</strong></div>
     </div>
-    {% endif %}
-
-    {% if current.wickets > 0 %}
-    <div class="player-box">
-        <span>Wickets</span>
-        <strong>{{ current.wickets }}</strong>
-    </div>
-    {% endif %}
-
-    {% if current.strike_rate > 0 %}
-    <div class="player-box">
-        <span>Strike Rate</span>
-        <strong>{{ current.strike_rate }}</strong>
-    </div>
-    {% endif %}
-
-    {% if current.economy > 0 %}
-    <div class="player-box">
-        <span>Economy</span>
-        <strong>{{ current.economy }}</strong>
-    </div>
-    {% endif %}
-
-    {% if current.catches > 0 %}
-    <div class="player-box">
-        <span>Catches</span>
-        <strong>{{ current.catches }}</strong>
-    </div>
-    {% endif %}
-</div>
-
-<!-- ================= FORM METRICS ================= -->
-<div class="player-details mt-3">
-    <div class="player-box">
-        <span>Form</span>
-        <strong>{{ current.form_rating }}/10</strong>
-    </div>
-    <div class="player-box">
-        <span>Fitness</span>
-        <strong>{{ current.fitness_rating }}/10</strong>
-    </div>
-    <div class="player-box">
-        <span>Consistency</span>
-        <strong>{{ current.consistency }}/10</strong>
-    </div>
-</div>
-
-<div class="alert alert-warning text-center mt-3">
-    Strategy Points Hidden During Auction
-</div>
-
-<!-- ================= SOLD FORM ================= -->
-<form method="post" action="/sell"
-onsubmit="return handleSold(
-    event,
-    '{{ current.name }}',
-    document.querySelector('select[name=team_id] option:checked').text,
-    document.querySelector('input[name=price]').value
-)">
-    <input type="hidden" name="player_id" value="{{ current.id }}">
-    <input type="hidden" name="category" value="{{ category }}">
-
-    <input class="form-control mt-3" name="price" placeholder="Final Price" required>
-
-    <select class="form-select mt-2" name="team_id">
-        {% for t in teams %}
-        <option value="{{ t.id }}">
-            {{ t.name }} (₹{{ t.purse - t.spent }})
-        </option>
-        {% endfor %}
-    </select>
-
-    <button class="btn btn-success w-100 mt-3">
-        SOLD
-    </button>
-</form>
-
 </div>
 {% endif %}
 </div>
 
 </div>
 {% endif %}
+
 </div>
-
-<!-- ================= AUDIO ================= -->
-<audio id="ipl" src="/static/sounds/ipl.mp3"></audio>
-<audio id="hammer" src="/static/sounds/hammer.mp3"></audio>
-
+{% endblock %}
 <script>
-/* ================= IPL THEME ================= */
-let bgStarted = false;
-const theme = document.getElementById("ipl");
-const hammer = document.getElementById("hammer");
-
-function startIPLThemeOnce() {
-    if (bgStarted) return;
-    bgStarted = true;
-
-    theme.volume = 0.25;
-    theme.currentTime = 0;
-    theme.play().catch(()=>{});
-
-    setInterval(() => {
-        theme.currentTime = 0;
-        theme.play().catch(()=>{});
-    }, 210000); // 3.5 minutes
-}
-
-document.body.addEventListener("click", startIPLThemeOnce, { once: true });
-
-/* ================= VOICE ENGINE ================= */
-function loadVoices() {
-    return new Promise(resolve => {
-        let voices = speechSynthesis.getVoices();
-        if (voices.length) resolve(voices);
-        else speechSynthesis.onvoiceschanged = () =>
-            resolve(speechSynthesis.getVoices());
-    });
-}
-
-async function getVoice() {
-    const voices = await loadVoices();
-    const type = document.getElementById("voiceType").value;
-
-    if (type === "female") {
-        const femaleKeys = [
-            "zira","samantha","karen","female",
-            "victoria","moira","sona","google हिन्दी"
-        ];
-        return voices.find(v =>
-            femaleKeys.some(k => v.name.toLowerCase().includes(k))
-        ) || voices.find(v => v.pitch >= 1) || voices[0];
+function validateSell() {
+    const team = document.getElementById("teamSelect");
+    if (!team.value) {
+        alert("⚠️ Please select an eligible team before selling!");
+        return false;
     }
-
-    const maleKeys = ["david","daniel","alex","mark","male"];
-    return voices.find(v =>
-        maleKeys.some(k => v.name.toLowerCase().includes(k))
-    ) || voices[0];
-}
-
-async function speak(text) {
-    await loadVoices();
-    speechSynthesis.cancel();
-
-    const u = new SpeechSynthesisUtterance(text);
-    u.voice = await getVoice();
-    u.rate = 0.9;
-    u.pitch = document.getElementById("voiceType").value === "female" ? 1.2 : 1;
-    u.volume = 1;
-
-    speechSynthesis.speak(u);
-}
-
-/* ================= AUCTION VOICES ================= */
-function announcePlayer(name, base) {
-    speak(`${name}, base price ${base} crores, is now in the auction`);
-}
-
-async function handleSold(e, player, team, price) {
-    e.preventDefault();
-
-    await speak("Going once");
-    await new Promise(r => setTimeout(r, 1200));
-
-    await speak("Going twice");
-    await new Promise(r => setTimeout(r, 1200));
-
-    hammer.currentTime = 0;
-    hammer.play().catch(()=>{});
-
-    await speak(`${player} sold to ${team} for ${price} crores`);
-
-    setTimeout(() => e.target.submit(), 2000);
-    return false;
+    return true;
 }
 </script>
-
-{% endblock %}

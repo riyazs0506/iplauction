@@ -2,3 +2,5 @@ flask
 flask-socketio
 eventlet
 mysql-connector-python
+flask-socketio 
+eventlet
