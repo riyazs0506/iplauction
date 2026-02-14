@@ -1,10 +1,11 @@
 import eventlet
 eventlet.monkey_patch()
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO
 import mysql.connector
-from config import MYSQL_CONFIG
+import os
+
 
 
 app = Flask(__name__)
